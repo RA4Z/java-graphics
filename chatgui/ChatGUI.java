@@ -7,7 +7,7 @@ public class ChatGUI extends JFrame {
     public ChatGUI() {
         // Configuração da janela
         setTitle("Chat");
-        setSize(400, 300);
+        setSize(750, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

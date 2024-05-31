@@ -2,9 +2,11 @@ package chatgui;
 
 import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class PythonExecutor extends SwingWorker<Void, String> {
 
@@ -21,34 +23,37 @@ public class PythonExecutor extends SwingWorker<Void, String> {
     @Override
     protected Void doInBackground() throws Exception {
         try {
-            // Desabilita o campo de mensagem e o botão Enviar
             publish("Enviando mensagem...");
 
-            // Executar o script Python
-            String filePath = new File(".").getAbsolutePath() + "\\scripts\\Gemini\\gemini.py";
-            ProcessBuilder pb = new ProcessBuilder("python", filePath, message);
-            Process process = pb.start();
+            // URL do seu servidor Flask
+            URL url = new URL("http://10.1.43.63:5000/gemini");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
 
-            // Ler a saída do Processo
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder buffer = new StringBuilder();
+            // Enviar a mensagem como parâmetro
+            String data = "message=" + URLEncoder.encode(message, "UTF-8");
+            OutputStream output = connection.getOutputStream();
+            output.write(data.getBytes("UTF-8"));
+            output.flush();
+            output.close();
+
+            // Ler a resposta do servidor
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+            StringBuilder response = new StringBuilder();
             String line;
+            
             while ((line = reader.readLine()) != null) {
-                buffer.append(line);
+                response.append(line);
             }
             reader.close();
 
-            // Verificar o código de saída do processo
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("Erro ao executar o script Python (código de saída: " + exitCode + ")");
-            }
+            // Processar a resposta (assuma que é JSON)
+            // ... (ajuste de acordo com a estrutura da resposta) ...
+            publish(response.toString()); // Publica a resposta para ser exibida
 
-            // Retorna o resultado
-            publish(buffer.toString().replace("\\n", "\n"));
-
-        } catch (IOException | InterruptedException ex) {
-            throw new RuntimeException("Erro ao executar o script Python: " + ex.getMessage());
+        } catch (Exception ex) {
+            throw new RuntimeException("Erro ao comunicar com o servidor Flask: " + ex.getMessage());
         }
         return null;
     }
@@ -59,13 +64,16 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             if (chunk.equals("Enviando mensagem...")) {
                 statusLabel.setText(chunk);
             } else {
-                chatArea.append("Gemini: " + chunk + "\n\n");
+                // Processar a resposta JSON aqui
+                // ...
+                // Exemplo: assumindo que a resposta é apenas uma string
+                chatArea.append("Gemini: " + chunk + "\n\n"); 
             }
         }
     }
 
     @Override
     protected void done() {
-        statusLabel.setText(""); // Volta para espaço vazio
+        statusLabel.setText("");
     }
 }
