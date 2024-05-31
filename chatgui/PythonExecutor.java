@@ -37,14 +37,15 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             output.write(data.getBytes("UTF-8"));
             output.flush();
             output.close();
-
+            
             // Ler a resposta do servidor
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             StringBuilder response = new StringBuilder();
             String line;
             
             while ((line = reader.readLine()) != null) {
-                response.append(line);
+                System.out.println(line);
+                response.append(line + "\n");
             }
             reader.close();
 
