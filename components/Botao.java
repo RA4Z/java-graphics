@@ -45,21 +45,24 @@ public class Botao extends JButton implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             // Executar o script Python
-            String filePath = new File(".").getAbsolutePath() + "\\script.py";
+            String filePath = new File(".").getAbsolutePath() + "\\script.exe";
 
-            ProcessBuilder pb = new ProcessBuilder("python", filePath, "5", "11"); // "5 11" são os argumentos para o script
+            // Criar o ProcessBuilder - Para executar Python: ("python", filePath, "5", "11")
+            ProcessBuilder pb = new ProcessBuilder(filePath, "5", "11"); // "5 11" são os argumentos para o script
+
+            //Iniciar o Processo
             Process process = pb.start(); 
 
+            // Ler a saída do Processo
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            
             StringBuilder buffer = new StringBuilder();
-
             String line = null;
             while ((line = reader.readLine()) != null){           
                 buffer.append(line);
             }
+            reader.close(); // Fechar o leitor
             
-            // Exibir o resultado no JOptionPane
+            // Exibir o resultado
             JOptionPane.showMessageDialog(null, "Value is: " + buffer.toString());
 
         } catch (IOException ex) {
