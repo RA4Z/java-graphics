@@ -13,6 +13,7 @@ public class ChatGUI extends JFrame {
 
     private JTextArea chatArea;
     private JTextField messageField;
+    private JLabel statusLabel; // Rótulo para exibir o status
     private JButton sendButton;
     private String result = ""; // Variável para armazenar o resultado do script Python
 
@@ -44,6 +45,12 @@ public class ChatGUI extends JFrame {
         sendButton.setBackground(new Color(0x0C2D48));
         sendButton.setForeground(Color.WHITE);
         sendButton.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        // Cria o rótulo de status
+        statusLabel = new JLabel("");
+        statusLabel.setHorizontalAlignment(SwingConstants.LEFT); // Alinha o texto à esquerda
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        statusLabel.setForeground(Color.GRAY);
 
         // Adiciona um KeyListener ao campo de entrada
         messageField.addKeyListener(new KeyListener() {
@@ -114,6 +121,9 @@ public class ChatGUI extends JFrame {
         bottomPanel.add(messageField, BorderLayout.CENTER); // Adiciona o campo de entrada ao centro
         bottomPanel.add(sendButton, BorderLayout.EAST); // Adiciona o botão à direita
 
+        // Adiciona o rótulo de status ao painel inferior
+        bottomPanel.add(statusLabel, BorderLayout.WEST);
+
         contentPane.add(scrollPane, BorderLayout.CENTER);
         contentPane.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -128,6 +138,7 @@ public class ChatGUI extends JFrame {
         messageField.setEnabled(false);
         sendButton.setEnabled(false);
 
+        statusLabel.setText("Processando...");
         // Cria e inicia uma nova thread para executar o script Python
         Thread thread = new Thread(() -> {
             try {
@@ -149,6 +160,7 @@ public class ChatGUI extends JFrame {
                 int exitCode = process.waitFor();
                 if (exitCode != 0) {
                     // Erro na execução do script Python
+                    statusLabel.setText(""); // Volta para espaço vazio
                     String errorMessage = "Erro ao executar o script Python (código de saída: " + exitCode + ")";
                     JOptionPane.showMessageDialog(null, errorMessage);
                     return;
@@ -161,10 +173,14 @@ public class ChatGUI extends JFrame {
                         chatArea.append("Gemini: " + result + "\n\n");
                         result = "";
                     }
+                    // Limpa a mensagem de status
+                    statusLabel.setText(""); // Volta para espaço vazio
                 });
             } catch (IOException | InterruptedException ex) {
+                statusLabel.setText(""); // Volta para espaço vazio
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Erro ao executar o script Python: " + ex.getMessage());
+                // Limpa a mensagem de status em caso de erro
             } finally {
                 // Habilita o campo de mensagem e o botão Enviar após a execução do script
                 SwingUtilities.invokeLater(() -> {
