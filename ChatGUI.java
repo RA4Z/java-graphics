@@ -48,7 +48,8 @@ public class ChatGUI extends JFrame {
         // Adiciona um KeyListener ao campo de entrada
         messageField.addKeyListener(new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {
+            }
 
             @Override
             public void keyPressed(KeyEvent e) {
@@ -72,7 +73,8 @@ public class ChatGUI extends JFrame {
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {
+            }
         });
 
         // Define a ação do botão "Enviar"
@@ -122,34 +124,56 @@ public class ChatGUI extends JFrame {
 
     // Função para executar o script Python
     private void executePythonScript(String message) {
-        try {
-            // Executar o script Python
-            String filePath = new File(".").getAbsolutePath() + "\\scripts\\Gemini\\gemini.py";
+        // Desabilita o campo de mensagem e o botão Enviar
+        messageField.setEnabled(false);
+        sendButton.setEnabled(false);
 
-            // Criar o ProcessBuilder - Para executar Python: ("python", filePath, "5", "11")
-            // ProcessBuilder pb = new ProcessBuilder(filePath, "5", "11"); // "5 11" são os argumentos para o script
-            ProcessBuilder pb = new ProcessBuilder("python", filePath, message);
+        // Cria e inicia uma nova thread para executar o script Python
+        Thread thread = new Thread(() -> {
+            try {
+                // Executar o script Python
+                String filePath = new File(".").getAbsolutePath() + "\\scripts\\Gemini\\gemini.py";
+                ProcessBuilder pb = new ProcessBuilder("python", filePath, message);
+                Process process = pb.start();
 
-            //Iniciar o Processo
-            Process process = pb.start();
+                // Ler a saída do Processo
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                StringBuilder buffer = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                reader.close();
 
-            // Ler a saída do Processo
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder buffer = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null){
-                buffer.append(line);
+                // Verificar o código de saída do processo
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    // Erro na execução do script Python
+                    String errorMessage = "Erro ao executar o script Python (código de saída: " + exitCode + ")";
+                    JOptionPane.showMessageDialog(null, errorMessage);
+                    return;
+                }
+
+                // Atualiza a área de chat com a resposta do script
+                SwingUtilities.invokeLater(() -> {
+                    result = buffer.toString().replace("\\n", "\n");
+                    if (!result.isEmpty()) {
+                        chatArea.append("Gemini: " + result + "\n\n");
+                        result = "";
+                    }
+                });
+            } catch (IOException | InterruptedException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Erro ao executar o script Python: " + ex.getMessage());
+            } finally {
+                // Habilita o campo de mensagem e o botão Enviar após a execução do script
+                SwingUtilities.invokeLater(() -> {
+                    messageField.setEnabled(true);
+                    sendButton.setEnabled(true);
+                });
             }
-            reader.close(); // Fechar o leitor
-
-            // Exibir o resultado
-            result = buffer.toString().replace("\\n", "\n");
-            //JOptionPane.showMessageDialog(null, "Resultado: " + buffer.toString().replace("\\n", "\n"));
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Erro ao executar o script Python: " + ex.getMessage());
-        }
+        });
+        thread.start();
     }
 
     public static void main(String[] args) {
