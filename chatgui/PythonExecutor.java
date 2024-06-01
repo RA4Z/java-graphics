@@ -13,19 +13,26 @@ public class PythonExecutor extends SwingWorker<Void, String> {
     private final String message;
     private final JTextArea chatArea;
     private final JLabel statusLabel;
+    private final JTextField messageField;
+    private final JButton sendButton;
 
-    public PythonExecutor(String message, JTextArea chatArea, JLabel statusLabel) {
+    public PythonExecutor(String message, JTextArea chatArea, JLabel statusLabel, JTextField messageField, JButton sendButton) {
         this.message = message;
         this.chatArea = chatArea;
         this.statusLabel = statusLabel;
+        this.messageField = messageField;
+        this.sendButton = sendButton;
     }
 
     @Override
     protected Void doInBackground() throws Exception {
         try {
+            this.messageField.setEnabled(false);
+            this.sendButton.setEnabled(false);
+
             publish("Enviando mensagem...");
 
-            // URL do seu servidor Flask
+            // URL do servidor Flask
             URL url = new URL("http://10.1.43.63:5000/gemini");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -49,13 +56,14 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             }
             reader.close();
 
-            // Processar a resposta (assuma que é JSON)
-            // ... (ajuste de acordo com a estrutura da resposta) ...
             publish(response.toString()); // Publica a resposta para ser exibida
 
         } catch (Exception ex) {
             throw new RuntimeException("Erro ao comunicar com o servidor Flask: " + ex.getMessage());
         }
+
+        this.messageField.setEnabled(true);
+        this.sendButton.setEnabled(true);
         return null;
     }
 
@@ -65,10 +73,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             if (chunk.equals("Enviando mensagem...")) {
                 statusLabel.setText(chunk);
             } else {
-                // Processar a resposta JSON aqui
-                // ...
-                // Exemplo: assumindo que a resposta é apenas uma string
-                chatArea.append("Gemini: " + chunk + "\n\n"); 
+                chatArea.append("Gemini: " + chunk + "\n\n");
             }
         }
     }

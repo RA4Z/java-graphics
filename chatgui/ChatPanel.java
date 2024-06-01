@@ -1,6 +1,9 @@
 package chatgui;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +27,16 @@ public class ChatPanel extends JPanel {
         chatArea.setEditable(false);
         chatArea.setBackground(new Color(0x176B87)); // Cor de fundo do output: #176b87
         chatArea.setForeground(Color.WHITE);
-        chatArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        chatArea.setFont(new Font("Arial", Font.PLAIN, 16));
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
+
+        // Cria um padding preto de 10 pixels
+        EmptyBorder paddingBorder = new EmptyBorder(15, 15, 15, 15);
+        LineBorder blackBorder = new LineBorder(new Color(0x176B87)); // Cria a borda preta
+
+        // Cria uma borda composta com o padding e a borda preta
+        chatArea.setBorder(new CompoundBorder(paddingBorder, blackBorder));
 
         messageField = new JTextField();
         messageField.setBackground(new Color(0x053B50)); // Cor de fundo do input: #053b50
@@ -40,7 +50,7 @@ public class ChatPanel extends JPanel {
 
         statusLabel = new JLabel("");
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 14));
         statusLabel.setForeground(Color.GRAY);
 
         // Adiciona componentes ao painel
@@ -84,7 +94,7 @@ public class ChatPanel extends JPanel {
             messageField.setText("");
 
             // Executa o script Python em uma thread separada
-            new PythonExecutor(message, chatArea, statusLabel).execute();
+            new PythonExecutor(message, chatArea, statusLabel, messageField, sendButton).execute();
         }
     }
 }
