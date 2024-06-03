@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 public class PythonExecutor extends SwingWorker<Void, String> {
 
@@ -78,7 +79,17 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             } else {
                 // Adiciona texto ao JTextPane com estilo HTML
                 chatArea.setContentType("text/html");
-                messageHistory.append("<span style=\"color:black\">" + chunk + "</span> <br>");
+
+                Pattern pattern = Pattern.compile("\\*\\*(.*?)\\*\\*");
+                String formattedText = pattern.matcher(chunk).replaceAll("<strong>$1</strong>");
+
+                Pattern linkRegex = Pattern.compile("(https?:\\/\\/[^\\s]+)");
+                formattedText = linkRegex.matcher(formattedText)
+                        .replaceAll("<a href=\"$1\" style=\"color:#3B8CED\" target=\"_blank\">$1</a>");
+
+                messageHistory.append(
+                        "<div style=\"color:white; background-color: #176B87; border: 1px solid #000; word-wrap: break-word;\">"
+                                + formattedText + "</div> <br>");
 
                 try {
                     chatArea.setText(messageHistory.toString());

@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.regex.Pattern;
 
 public class ChatPanel extends JPanel {
 
@@ -94,11 +95,21 @@ public class ChatPanel extends JPanel {
         if (!message.isEmpty()) {
             // Adiciona texto ao chatArea com estilo HTML
             chatArea.setContentType("text/html");
-            messageHistory.append("<span style=\"color:red\">" + message + "</span> <br><br>");
-            
+
+            Pattern pattern = Pattern.compile("\\*\\*(.*?)\\*\\*");
+            String formattedText = pattern.matcher(message).replaceAll("<strong>$1</strong>");
+
+            Pattern linkRegex = Pattern.compile("(https?:\\/\\/[^\\s]+)");
+            formattedText = linkRegex.matcher(formattedText)
+                    .replaceAll("<a href=\"$1\" style=\"color:#3B8CED\" target=\"_blank\">$1</a>");
+
+            messageHistory.append(
+                    "<div style=\"color:white; background-color: #053B50; border: 1px solid #000; word-wrap: break-word;\">"
+                            + formattedText + "</div> <br>");
+
             try {
                 chatArea.setText(messageHistory.toString());
-                
+
             } catch (Error e) {
                 e.printStackTrace();
             }
