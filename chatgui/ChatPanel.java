@@ -94,7 +94,7 @@ public class ChatPanel extends JPanel {
         if (!message.isEmpty()) {
             // Adiciona texto ao chatArea com estilo HTML
             chatArea.setContentType("text/html");
-
+            
             Pattern pattern = Pattern.compile("\\*\\*(.*?)\\*\\*");
             String formattedText = pattern.matcher(message).replaceAll("<strong>$1</strong>");
 

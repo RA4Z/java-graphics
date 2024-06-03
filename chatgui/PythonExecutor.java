@@ -35,6 +35,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             this.messageField.setEnabled(false);
             this.sendButton.setEnabled(false);
 
+            String userName = System.getProperty("user.name");
             publish("Enviando mensagem...");
 
             // URL do servidor Flask
@@ -44,7 +45,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             connection.setDoOutput(true);
 
             // Enviar a mensagem como parâmetro
-            String data = "message=" + URLEncoder.encode(message, "UTF-8");
+            String data = "message=" + URLEncoder.encode(message, "UTF-8") + "&username=" + URLEncoder.encode(userName, "UTF-8");
             OutputStream output = connection.getOutputStream();
             output.write(data.getBytes("UTF-8"));
             output.flush();
@@ -59,7 +60,6 @@ public class PythonExecutor extends SwingWorker<Void, String> {
                 response.append(line + "<br>");
             }
             reader.close();
-            System.out.println(response.toString());
             publish(response.toString()); // Publica a resposta para ser exibida
 
         } catch (Exception ex) {
@@ -85,7 +85,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
 
                 Pattern linkRegex = Pattern.compile("(https?:\\/\\/[^\\s]+)");
                 formattedText = linkRegex.matcher(formattedText)
-                        .replaceAll("<a href=\"$1\" style=\"color:#3B8CED\" target=\"_blank\">$1</a>");
+                        .replaceAll("<a href=\"$1\" style=\"color:#3B8CED;\" target=\"_blank\">$1</a>");
 
                 messageHistory.append(
                         "<div style=\"font-size:18px; color:white; padding:5px; background-color: #176B87; border: 1px solid #000;\">"
