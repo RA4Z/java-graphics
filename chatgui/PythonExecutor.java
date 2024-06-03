@@ -88,7 +88,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
                         .replaceAll("<a href=\"$1\" style=\"color:#3B8CED\" target=\"_blank\">$1</a>");
 
                 messageHistory.append(
-                        "<div style=\"color:white; background-color: #176B87; border: 1px solid #000; word-wrap: break-word;\">"
+                        "<div style=\"font-size:18px; color:white; padding:5px; background-color: #176B87; border: 1px solid #000;\">"
                                 + formattedText + "</div> <br>");
 
                 try {

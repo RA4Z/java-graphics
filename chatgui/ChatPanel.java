@@ -30,7 +30,6 @@ public class ChatPanel extends JPanel {
         chatArea.setEditable(false);
         chatArea.setBackground(new Color(0xe8e7e7)); // Cor de fundo do output: #176b87
         chatArea.setForeground(Color.WHITE);
-        chatArea.setFont(new Font("Arial", Font.PLAIN, 16));
 
         // Cria um padding preto de 10 pixels
         EmptyBorder paddingBorder = new EmptyBorder(15, 15, 15, 15);
@@ -40,14 +39,14 @@ public class ChatPanel extends JPanel {
         chatArea.setBorder(new CompoundBorder(paddingBorder, blackBorder));
 
         messageField = new JTextField();
-        messageField.setBackground(new Color(0x053B50)); // Cor de fundo do input: #053b50
-        messageField.setForeground(Color.WHITE);
-        messageField.setFont(new Font("Arial", Font.PLAIN, 14));
+        messageField.setBackground(Color.WHITE); // Cor de fundo do input: #053b50
+        messageField.setForeground(Color.BLACK);
+        messageField.setFont(new Font("Arial", Font.PLAIN, 22));
 
         sendButton = new JButton("Enviar");
         sendButton.setBackground(new Color(0x0C2D48));
         sendButton.setForeground(Color.WHITE);
-        sendButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        sendButton.setFont(new Font("Arial", Font.PLAIN, 22));
 
         statusLabel = new JLabel("");
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -104,7 +103,7 @@ public class ChatPanel extends JPanel {
                     .replaceAll("<a href=\"$1\" style=\"color:#3B8CED\" target=\"_blank\">$1</a>");
 
             messageHistory.append(
-                    "<div style=\"color:white; background-color: #053B50; border: 1px solid #000; word-wrap: break-word;\">"
+                    "<div style=\"font-size:18px; color:white; padding:5px; border: 1px solid #000; background-color: #053B50; text-align: right;\">"
                             + formattedText + "</div> <br>");
 
             try {
