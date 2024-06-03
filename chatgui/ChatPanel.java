@@ -41,12 +41,12 @@ public class ChatPanel extends JPanel {
         messageField = new JTextField();
         messageField.setBackground(Color.WHITE); // Cor de fundo do input: #053b50
         messageField.setForeground(Color.BLACK);
-        messageField.setFont(new Font("Arial", Font.PLAIN, 22));
+        messageField.setFont(new Font("Arial", Font.PLAIN, 30));
 
         sendButton = new JButton("Enviar");
         sendButton.setBackground(new Color(0x0C2D48));
         sendButton.setForeground(Color.WHITE);
-        sendButton.setFont(new Font("Arial", Font.PLAIN, 22));
+        sendButton.setFont(new Font("Arial", Font.PLAIN, 30));
 
         statusLabel = new JLabel("");
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);

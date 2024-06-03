@@ -89,7 +89,7 @@ public class PythonExecutor extends SwingWorker<Void, String> {
 
                 messageHistory.append(
                         "<div style=\"font-size:18px; color:white; padding:5px; background-color: #176B87; border: 1px solid #000;\">"
-                                + formattedText + "</div> <br>");
+                                + "🤖<br>" + formattedText + "</div> <br>");
 
                 try {
                     chatArea.setText(messageHistory.toString());
