@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,10 +13,11 @@ import java.awt.event.KeyListener;
 
 public class ChatPanel extends JPanel {
 
-    private JTextArea chatArea;
+    private JTextPane chatArea; // Substituindo JTextArea por JTextPane
     private JTextField messageField;
     private JButton sendButton;
     private JLabel statusLabel;
+    private StringBuilder messageHistory = new StringBuilder();
 
     public ChatPanel() {
         // Configuração do painel
@@ -23,17 +25,15 @@ public class ChatPanel extends JPanel {
         setBackground(new Color(0xE8E7E7)); // Cor do chat: #e8e7e7
 
         // Criação dos componentes
-        chatArea = new JTextArea();
+        chatArea = new JTextPane();
         chatArea.setEditable(false);
-        chatArea.setBackground(new Color(0x176B87)); // Cor de fundo do output: #176b87
+        chatArea.setBackground(new Color(0xe8e7e7)); // Cor de fundo do output: #176b87
         chatArea.setForeground(Color.WHITE);
         chatArea.setFont(new Font("Arial", Font.PLAIN, 16));
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
 
         // Cria um padding preto de 10 pixels
         EmptyBorder paddingBorder = new EmptyBorder(15, 15, 15, 15);
-        LineBorder blackBorder = new LineBorder(new Color(0x176B87)); // Cria a borda preta
+        LineBorder blackBorder = new LineBorder(new Color(0xe8e7e7)); // Cria a borda preta
 
         // Cria uma borda composta com o padding e a borda preta
         chatArea.setBorder(new CompoundBorder(paddingBorder, blackBorder));
@@ -66,7 +66,8 @@ public class ChatPanel extends JPanel {
         // Ações dos botões e campos de texto
         messageField.addKeyListener(new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {
+            }
 
             @Override
             public void keyPressed(KeyEvent e) {
@@ -76,7 +77,8 @@ public class ChatPanel extends JPanel {
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {
+            }
         });
 
         sendButton.addActionListener(new ActionListener() {
@@ -90,11 +92,21 @@ public class ChatPanel extends JPanel {
     private void sendMessage() {
         String message = messageField.getText();
         if (!message.isEmpty()) {
-            chatArea.append("Você: " + message + "\n\n");
+            // Adiciona texto ao chatArea com estilo HTML
+            chatArea.setContentType("text/html");
+            messageHistory.append("<span style=\"color:red\">" + message + "</span> <br><br>");
+            
+            try {
+                chatArea.setText(messageHistory.toString());
+                
+            } catch (Error e) {
+                e.printStackTrace();
+            }
+
             messageField.setText("");
 
             // Executa o script Python em uma thread separada
-            new PythonExecutor(message, chatArea, statusLabel, messageField, sendButton).execute();
+            new PythonExecutor(message, chatArea, statusLabel, messageField, sendButton, messageHistory).execute();
         }
     }
 }

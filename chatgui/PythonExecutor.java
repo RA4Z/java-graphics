@@ -1,6 +1,7 @@
 package chatgui;
 
 import javax.swing.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,17 +12,20 @@ import java.net.URLEncoder;
 public class PythonExecutor extends SwingWorker<Void, String> {
 
     private final String message;
-    private final JTextArea chatArea;
+    private final JTextPane chatArea; // Mudança: JTextPane
     private final JLabel statusLabel;
     private final JTextField messageField;
     private final JButton sendButton;
+    private StringBuilder messageHistory;
 
-    public PythonExecutor(String message, JTextArea chatArea, JLabel statusLabel, JTextField messageField, JButton sendButton) {
+    public PythonExecutor(String message, JTextPane chatArea, JLabel statusLabel, JTextField messageField,
+            JButton sendButton, StringBuilder messageHistory) {
         this.message = message;
         this.chatArea = chatArea;
         this.statusLabel = statusLabel;
         this.messageField = messageField;
         this.sendButton = sendButton;
+        this.messageHistory = messageHistory;
     }
 
     @Override
@@ -44,18 +48,17 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             output.write(data.getBytes("UTF-8"));
             output.flush();
             output.close();
-            
+
             // Ler a resposta do servidor
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             StringBuilder response = new StringBuilder();
             String line;
-            
+
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-                response.append(line + "\n");
+                response.append(line + "<br>");
             }
             reader.close();
-
+            System.out.println(response.toString());
             publish(response.toString()); // Publica a resposta para ser exibida
 
         } catch (Exception ex) {
@@ -73,7 +76,16 @@ public class PythonExecutor extends SwingWorker<Void, String> {
             if (chunk.equals("Enviando mensagem...")) {
                 statusLabel.setText(chunk);
             } else {
-                chatArea.append("Gemini: " + chunk + "\n\n");
+                // Adiciona texto ao JTextPane com estilo HTML
+                chatArea.setContentType("text/html");
+                messageHistory.append("<span style=\"color:black\">" + chunk + "</span> <br>");
+
+                try {
+                    chatArea.setText(messageHistory.toString());
+
+                } catch (Error e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
